@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <TOOLBASE_DIR>$(MSBuildThisFileDirectory)..\</TOOLBASE_DIR>
+  </PropertyGroup>
+  <PropertyGroup>
+    <IncludePath>$(IncludePath);$(TOOLBASE_DIR)TB_Base\include</IncludePath>
+  </PropertyGroup>
+  <ItemGroup />
+</Project>

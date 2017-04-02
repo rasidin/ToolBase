@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Main">
+      <UniqueIdentifier>{dc7ada5b-31ee-437b-81f4-b1b0bfef85dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Widgets">
+      <UniqueIdentifier>{072bfef4-ecde-40bf-bd20-ac15710b1643}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{6b98752c-e709-4862-9fa4-9b7a176baeea}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\WinMain.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TBMessageBox.cpp">
+      <Filter>Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TBApplication.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TBWidget.cpp">
+      <Filter>Widgets</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\TBMessageBox.h">
+      <Filter>Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TBApplication.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TBCommon.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TBWidget.h">
+      <Filter>Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TBEvent.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TBMath.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
