@@ -11,7 +11,6 @@
 #ifndef _TBCOMMON_H_
 #define _TBCOMMON_H_
 
-namespace ToolBase {
 #ifdef WIN32
 #define WIDGETHANDLE HWND
 #define WIDGETMESSAGE MSG
@@ -20,6 +19,12 @@ namespace ToolBase {
 #define WIDGETHANDLE
 #define WIDGETMESSAGE
 #endif
-}
+
+#ifndef LONG_MAX
+#define LONG_MAX 0x7fffffffffffffffll
+#endif
+#ifndef ULONG_MAX
+#define ULONG_MAX 0xffffffffffffffffull
+#endif
 
 #endif // _TBCOMMON_H_
