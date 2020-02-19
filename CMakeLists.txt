@@ -3,7 +3,9 @@ project(ToolBase)
 
 add_definitions(-DWIN32)
 
-add_library(ToolBase STATIC source/WinMain.cpp source/TBApplication.cpp source/TBMessageBox.cpp source/TBWidget.cpp)
+add_subdirectory(test)
+
+add_library(ToolBase STATIC source/WinMain.cpp source/TBApplication.cpp source/TBMessageBox.cpp source/TBWidget.cpp source/TBTime.cpp)
 
 target_include_directories(ToolBase PUBLIC ${PROJECT_SOURCE_DIR}/include)
 

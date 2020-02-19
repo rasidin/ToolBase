@@ -12,11 +12,12 @@
 
 #include "TBCommon.h"
 #include "TBApplication.h"
+#include "TBTime.h"
 
 namespace ToolBase {
 WIDGETINSTANCE TBWidget::instanceHandle = 0;
 unsigned int TBWidget::createCounter = 0;
-std::vector<TBWidget *> TBWidget::_widgets;
+std::list<TBWidget*> TBWidget::gWidgetList;
 #ifdef WIN32
 LRESULT CALLBACK WinProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
@@ -24,11 +25,11 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_DESTROY:
 		PostQuitMessage(0);
-		TBWidget::WidgetClosed(hWnd);
+		TBWidget::CloseWidget(hWnd);
 		break;
     case WM_SIZE:
     case WM_SIZING:
-        if (TBWidget *widget = TBWidget::GetWidget(hWnd))
+        if (TBWidget *widget = TBWidget::FindWidget(hWnd))
         {
             ResizeEvent re;
             re.size.width = LOWORD(lParam);
@@ -37,7 +38,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         }
         break;
     case WM_MOUSEMOVE:
-        if (TBWidget *widget = TBWidget::GetWidget(hWnd))
+        if (TBWidget *widget = TBWidget::FindWidget(hWnd))
         {
             MouseEvent me;
             me.pos.x = LOWORD(lParam);
@@ -51,7 +52,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
     case WM_RBUTTONDOWN:
     case WM_LBUTTONUP:
     case WM_RBUTTONUP:
-        if (TBWidget *widget = TBWidget::GetWidget(hWnd))
+        if (TBWidget *widget = TBWidget::FindWidget(hWnd))
         {
             MouseEvent me;
             me.pos.x = LOWORD(lParam);
@@ -87,18 +88,26 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 #endif
+void TBWidget::ForEachWidget(void (f)(TBWidget*, double)) 
+{
+	float deltaTime = 0.0;
+	for (WidgetList::iterator wlit = gWidgetList.begin(); wlit != gWidgetList.end(); wlit++) {
+		f(*wlit, deltaTime);
+	}
+}
 TBWidget::TBWidget(const char *name, int width, int height, int flag)
-	: _handle(0)
-    , _creationFlag(flag)
-	, _message()
-	, _name(name)
-    , _movable(false)
-    , _lastTime(timeGetTime())
-    , _updateTiming(16)     // 16ms (60fps)
+	: mCreationFlag(flag)
+	, mName(name)
+	, mClassName("TBWidget")
+	, mHandle(NULL)
+	, mMessage()
+    , mMovable(false)
+    , mLastTimeSeconds(TBTime::GetCurrentTimeSeconds())
+    , mUpdateTimingSeconds(0.016)     // 16ms (60fps)
 {
 #ifdef WIN32
-	_className = "TBWidget";
-	_className += createCounter;
+	mClassName = "TBWidget";
+	mClassName += createCounter;
 
 	WNDCLASSEX	wcex;
 	wcex.cbSize			= sizeof(wcex);
@@ -106,7 +115,7 @@ TBWidget::TBWidget(const char *name, int width, int height, int flag)
 	wcex.lpfnWndProc	= WinProc;
 	wcex.cbClsExtra		= 0;
 	wcex.cbWndExtra		= 0;
-	wcex.lpszClassName	= _className.c_str();
+	wcex.lpszClassName	= mClassName.c_str();
 	wcex.hInstance		= instanceHandle;
 	wcex.hIcon			= LoadIcon(NULL, IDI_APPLICATION);
 	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
@@ -133,13 +142,13 @@ TBWidget::TBWidget(const char *name, int width, int height, int flag)
         dwStyle = WS_POPUP;
     }
 
-	_handle = CreateWindowEx(
-        dwExStyle,
-		_className.c_str(),
-		_name.c_str(),
-        dwStyle,
-        CW_USEDEFAULT,
-        CW_USEDEFAULT,
+	mHandle = CreateWindowEx(
+		dwExStyle,
+		mClassName.c_str(),
+		mName.c_str(),
+		dwStyle,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
 		width,
 		height,
 		NULL,
@@ -147,27 +156,27 @@ TBWidget::TBWidget(const char *name, int width, int height, int flag)
 		instanceHandle,
 		NULL );
 
-	ShowWindow(_handle, SW_SHOWDEFAULT);
-	UpdateWindow(_handle);
+	ShowWindow(mHandle, SW_SHOWDEFAULT);
+	UpdateWindow(mHandle);
 
 	createCounter++;
-	_widgets.push_back(this);
+	gWidgetList.push_back(this);
 #endif
 }
 
 TBWidget::~TBWidget()
 {
-	UnregisterClass(_className.c_str(), instanceHandle);
+	UnregisterClass(mClassName.c_str(), instanceHandle);
 }
 
 void
 TBWidget::RemoveChild(TBWidget *w)
 {
-    for(VectorWidget::iterator tbwit = _children.begin();tbwit != _children.end();tbwit++)
+    for(WidgetVector::iterator tbwit = mChildren.begin();tbwit != mChildren.end();tbwit++)
     {
         if (*tbwit == w)
         {
-            _children.erase(tbwit);
+            mChildren.erase(tbwit);
             break;
         }
     }
@@ -177,7 +186,7 @@ TBRect
 TBWidget::GetWindowRect()
 {
     RECT rect;
-    ::GetWindowRect(_handle, &rect);
+    ::GetWindowRect(mHandle, &rect);
     return TBRect(rect.top, rect.bottom, rect.left, rect.right);
 }
 
@@ -188,13 +197,13 @@ TBWidget::MouseEvent(const _MouseEvent &event)
     {
         if (event.status == MouseEvent::STATUS_DOWN)
         {
-            _mousePosPrev = TBPoint(event.pos.x, event.pos.y);
+			mMousePosPrev = TBPoint(event.pos.x, event.pos.y);
             TBRect rect = this->GetWindowRect();
         }
         if (event.status == MouseEvent::STATUS_MOVE)
         {
-            if (_movable) {
-                TBPoint moved(event.pos.x - _mousePosPrev.x, event.pos.y - _mousePosPrev.y);
+            if (mMovable) {
+                TBPoint moved(event.pos.x - mMousePosPrev.x, event.pos.y - mMousePosPrev.y);
                 TBRect rect = this->GetWindowRect();
                 Move(rect.left + moved.x, rect.top + moved.y);
             }
@@ -205,33 +214,33 @@ TBWidget::MouseEvent(const _MouseEvent &event)
 void
 TBWidget::ResizeEvent(const _ResizeEvent &event)
 {
-    for(VectorWidget::iterator tbwit = _children.begin();tbwit != _children.end();tbwit++)
+    for(WidgetVector::iterator tbwit = mChildren.begin();tbwit != mChildren.end();tbwit++)
     {
         (*tbwit)->ResizeEvent(event);
     }
 }
 
 void 
-TBWidget::WidgetClosed(WIDGETHANDLE handle)
+TBWidget::CloseWidget(WIDGETHANDLE handle)
 {
-	for(size_t i=0;i<_widgets.size();i++)
+	for(WidgetList::iterator wlit = gWidgetList.begin();wlit != gWidgetList.end();++wlit)
 	{
-		if (_widgets[i]->GetHandle() ==  handle)
+		if ((*wlit)->GetHandle() ==  handle)
 		{
-			_widgets.erase(_widgets.begin() + i);
+			gWidgetList.erase(wlit);
 			break;
 		}
 	}
 }
 
 TBWidget* 
-TBWidget::GetWidget(WIDGETHANDLE handle)
+TBWidget::FindWidget(WIDGETHANDLE handle)
 {
-    for(size_t wdgcnt=0;wdgcnt<_widgets.size();wdgcnt++)
+	for(WidgetList::iterator wlit = gWidgetList.begin();wlit != gWidgetList.end();++wlit)
     {
-        if (_widgets[wdgcnt]->GetHandle() == handle)
+        if ((*wlit)->GetHandle() == handle)
         {
-            return _widgets[wdgcnt];
+			return *wlit;
         }
     }
     return NULL;
@@ -241,6 +250,6 @@ void
 TBWidget::Move(int x, int y)
 {
     TBRect rect = this->GetWindowRect();
-    MoveWindow(_handle, x, y, rect.width(), rect.height(), true);
+    MoveWindow(mHandle, x, y, rect.width(), rect.height(), true);
 }
 }

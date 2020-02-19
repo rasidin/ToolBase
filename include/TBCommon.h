@@ -20,11 +20,4 @@
 #define WIDGETMESSAGE
 #endif
 
-#ifndef LONG_MAX
-#define LONG_MAX 0x7fffffffffffffffll
-#endif
-#ifndef ULONG_MAX
-#define ULONG_MAX 0xffffffffffffffffull
-#endif
-
 #endif // _TBCOMMON_H_

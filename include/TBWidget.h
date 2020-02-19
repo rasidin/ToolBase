@@ -17,6 +17,7 @@
 #endif
 #include <string>
 #include <vector>
+#include <list>
 
 #include "TBCommon.h"
 #include "TBMath.h"
@@ -39,49 +40,50 @@ public:
 	TBWidget(const char *name, int width=-1, int height=-1, int flag=0);
 	~TBWidget();
 
-	WIDGETHANDLE GetHandle()							    { return _handle; }
+	WIDGETHANDLE GetHandle()							    { return mHandle; }
 
     TBRect GetWindowRect();
 
-    void SetLastTime(unsigned long t)                       { _lastTime = t; }
-    unsigned long GetLastTime() const                        { return _lastTime; }
+    void SetLastTimeSeconds(double t)						{ mLastTimeSeconds = t; }
+    double GetLastTimeSeconds() const						{ return mLastTimeSeconds; }
 
-    void SetUpdateTiming(unsigned int ut)                   { _updateTiming = ut; }
-    unsigned int GetUpdateTiming() const                    { return _updateTiming; }
+    void SetUpdateTimingSeconds(double ut)					{ mUpdateTimingSeconds = ut; }
+    double GetUpdateTimingSeconds() const					{ return mUpdateTimingSeconds; }
 
-	virtual void FrameUpdate(unsigned long elapasedTime)    { /* Do nothing */ }
+	virtual void FrameUpdate(double elapasedTime)	{ /* Do nothing */ }
     virtual void MouseEvent(const MouseEvent &event);
     virtual void ResizeEvent(const ResizeEvent &event);
 
     virtual void Move(int x, int y);
 
-    void AddChild(TBWidget *w)                              { _children.push_back(w); }
+    void AddChild(TBWidget *w)								{ mChildren.push_back(w); }
     void RemoveChild(TBWidget *w);
 
     // Static functions
-	static void WidgetClosed(WIDGETHANDLE handle);
-	static size_t GetCurrentWidgetNum()					    { return _widgets.size(); }
-	static TBWidget* GetWidget(unsigned int num)		    { return _widgets[num]; }
-    static TBWidget* GetWidget(WIDGETHANDLE handle);
+	static void CloseWidget(WIDGETHANDLE handle);
+	static size_t GetCurrentWidgetNum()						{ return gWidgetList.size(); }
+    static TBWidget* FindWidget(WIDGETHANDLE handle);
+	static void ForEachWidget(void (f)(TBWidget*, double));
 
 protected:
-	static std::vector<TBWidget *>	_widgets;
+	typedef std::list<TBWidget*> WidgetList;
+	static WidgetList	gWidgetList;
 
-    int                             _creationFlag;
-    typedef std::vector<TBWidget *> VectorWidget;
-    VectorWidget                    _children;
+    int					mCreationFlag;
+	typedef std::vector<TBWidget*> WidgetVector;
+	WidgetVector		mChildren;
 
-	std::string						_name;
-	std::string						_className;
+	std::string			mName;
+	std::string			mClassName;
 
-	WIDGETHANDLE					_handle;
-	WIDGETMESSAGE					_message;
+	WIDGETHANDLE		mHandle;
+	WIDGETMESSAGE		mMessage;
 
-    TBPoint                         _mousePosPrev;
-    bool                            _movable;
+    bool				mMovable;
+	TBPoint				mMousePosPrev;
 
-    unsigned long                   _lastTime;
-    unsigned int                    _updateTiming;
+    double				mLastTimeSeconds;
+    double				mUpdateTimingSeconds;
 };
 }
 

@@ -11,6 +11,7 @@
 #include "TBApplication.h"
 #include "TBCommon.h"
 #include "TBWidget.h"
+#include "TBTime.h"
 
 #ifdef WIN32
 #include <Windows.h>
@@ -20,17 +21,16 @@
 #include <assert.h>
 
 namespace ToolBase {
-TBApplication* TBApplication::_instance = 0;
+TBApplication* TBApplication::mInstance = 0;
 TBApplication::TBApplication()
-	: _quit(false)
 {
-	assert(!_instance);
-	_instance = static_cast<TBApplication*>(this);
+	assert(!mInstance);
+	mInstance = static_cast<TBApplication*>(this);
 }
 
 TBApplication::~TBApplication()
 {
-	_instance = 0;
+	mInstance = 0;
 }
 
 int TBApplication::Run()
@@ -38,9 +38,8 @@ int TBApplication::Run()
 	while(1)
 	{
 #ifdef WIN32
-        unsigned long time = timeGetTime();
         WIDGETMESSAGE msg;
-        if (!TBWidget::GetCurrentWidgetNum()) break;
+		if (!TBWidget::GetCurrentWidgetNum()) break;
         if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
             if (!GetMessage(&msg, NULL, 0, 0))
@@ -50,22 +49,15 @@ int TBApplication::Run()
 			DispatchMessage(&msg);
         }
         else {
-            for (unsigned int wgidx = 0; wgidx < TBWidget::GetCurrentWidgetNum(); wgidx++)
-            {
-                TBWidget *widget = TBWidget::GetWidget(wgidx);
-                unsigned long widgetLastTime = widget->GetLastTime();
-                unsigned long elapsedTime = 0UL;
-                if (widgetLastTime > time) {
-                    elapsedTime = ULONG_MAX - widgetLastTime + time;
-                }
-                else {
-                    elapsedTime = time - widgetLastTime;
-                }
-                if (elapsedTime > widget->GetUpdateTiming()) {
-                    widget->FrameUpdate(elapsedTime);
-                    widget->SetLastTime(time);
-                }
-            }
+			TBWidget::ForEachWidget([](TBWidget* widget, double deltaTime) {
+				double time = TBTime::GetCurrentTimeSeconds();
+				double widgetLastTime = widget->GetLastTimeSeconds();
+				double elapsedTime = time - widgetLastTime;
+				if (elapsedTime > widget->GetUpdateTimingSeconds()) {
+					widget->FrameUpdate(elapsedTime);
+					widget->SetLastTimeSeconds(time);
+				}
+			});
         }
         Sleep(1);
 #endif

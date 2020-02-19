@@ -8,8 +8,7 @@
  History:
  - 2012/6/14 Created by minseob
  ***********************************************************/
-#ifndef _TBAPPLICATION_H_
-#define _TBAPPLICATION_H_
+#pragma once
 
 namespace ToolBase {
 class TBApplication
@@ -19,15 +18,10 @@ public:
 	~TBApplication();
 
 	int Run();
-	void ReadyToQuit()								{ _quit = true; }
 
-	static TBApplication* GetInstance()				{ return _instance; }
+	static TBApplication* GetInstance()				{ return mInstance; }
 
 private:
-	static TBApplication		*_instance;
-
-	bool						 _quit;
+	static TBApplication		*mInstance;
 };
 } // namespace ToolBase
-
-#endif // _TBAPPLICATION_H_
