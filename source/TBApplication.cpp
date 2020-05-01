@@ -35,15 +35,14 @@ TBApplication::~TBApplication()
 
 int TBApplication::Run()
 {
-	while(1)
-	{
 #ifdef WIN32
-        WIDGETMESSAGE msg;
+    WIDGETMESSAGE msg;
+    while(1)
+	{
 		if (!TBWidget::GetCurrentWidgetNum()) break;
         if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
-            if (!GetMessage(&msg, NULL, 0, 0))
-                return static_cast<int>(msg.wParam);
+            if (msg.message == WM_QUIT) break;
 
             TranslateMessage(&msg);
 			DispatchMessage(&msg);
@@ -59,9 +58,10 @@ int TBApplication::Run()
 				}
 			});
         }
-        Sleep(1);
-#endif
 	}
-	return 1;
+    return static_cast<int>(msg.wParam);
+#else
+    return 1;
+#endif
 }
 }

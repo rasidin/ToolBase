@@ -3,10 +3,7 @@
  -----------------------------------------------------------
  @file  WinMain.cpp
  @brief WinMain
- @author minseob (rasidin1@hotmail.com)
- -----------------------------------------------------------
- History:
- - 2012/5/8 Created by minseob
+ @author minseob
  ***********************************************************/
 
 #ifdef WIN32
