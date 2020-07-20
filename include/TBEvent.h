@@ -30,6 +30,12 @@ namespace ToolBase {
         _ResizeEvent() { size.width = 0; size.height = 0; }
         _ResizeEvent(int width, int height) { size.width = width, size.height = height; }
     } ResizeEvent;
+    typedef struct _KeyboardEvent
+    {
+        enum STATUS { STATUS_DOWN, STATUS_UP } status;
+        unsigned int key;
+        _KeyboardEvent(STATUS inStatus, unsigned int inKey) : status(inStatus), key(inKey) {}
+    } KeyboardEvent;
 }
 
 #endif

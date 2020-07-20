@@ -8,6 +8,11 @@ public:
 	
 	virtual void FrameUpdate(double frameTime) override {
 	}
+
+    virtual void KeyboardEvent(const ToolBase::KeyboardEvent &event)
+    {
+        printf("%d\n", event.key);
+    }
 };
 
 int main()

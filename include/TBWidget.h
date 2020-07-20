@@ -53,6 +53,7 @@ public:
 	virtual void FrameUpdate(double elapasedTime)	{ /* Do nothing */ }
     virtual void MouseEvent(const MouseEvent &event);
     virtual void ResizeEvent(const ResizeEvent &event);
+    virtual void KeyboardEvent(const KeyboardEvent &event) {}
 
     virtual void Move(int x, int y);
 

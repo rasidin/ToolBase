@@ -37,6 +37,16 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
             widget->ResizeEvent(re);
         }
         break;
+    case WM_KEYDOWN:
+        if (TBWidget *widget = TBWidget::FindWidget(hWnd))
+        {
+            widget->KeyboardEvent(KeyboardEvent(KeyboardEvent::STATUS_DOWN, static_cast<unsigned int>(wParam)));
+        } break;
+    case WM_KEYUP:
+        if (TBWidget *widget = TBWidget::FindWidget(hWnd))
+        {
+            widget->KeyboardEvent(KeyboardEvent(KeyboardEvent::STATUS_UP, static_cast<unsigned int>(wParam)));
+        } break;
     case WM_MOUSEMOVE:
         if (TBWidget *widget = TBWidget::FindWidget(hWnd))
         {
