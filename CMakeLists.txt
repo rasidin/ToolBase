@@ -3,7 +3,10 @@ project(ToolBase)
 
 add_definitions(-DWIN32)
 
-add_subdirectory(test)
+option(MAKE_TEST "Make test program" OFF)
+if (MAKE_TEST)
+	add_subdirectory(test)
+endif()
 
 add_library(ToolBase STATIC source/WinMain.cpp source/TBApplication.cpp source/TBMessageBox.cpp source/TBWidget.cpp source/TBTime.cpp)
 
