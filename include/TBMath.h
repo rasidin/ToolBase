@@ -3,7 +3,7 @@ ToolBase Header File
 -----------------------------------------------------------
 @file  TBMath.h
 @brief ToolBase Math Functions
-@author minseob (rasidin1@hotmail.com)
+@author minseob (https://github.com/rasidin)
 -----------------------------------------------------------
 History:
 - 2014/1/24 Created by minseob

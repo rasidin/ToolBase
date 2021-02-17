@@ -3,7 +3,7 @@
  -----------------------------------------------------------
  @file  TBMessageBox.h
  @brief ToolBase Mesage Box
- @author minseob (rasidin1@hotmail.com)
+ @author minseob (https://github.com/rasidin)
  -----------------------------------------------------------
  History:
  - 2012/5/9 Created by minseob

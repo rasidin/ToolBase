@@ -3,7 +3,7 @@
  -----------------------------------------------------------
  @file  TBCommon.h
  @brief ToolBase Common Definition
- @author minseob (rasidin1@hotmail.com)
+ @author minseob (https://github.com/rasidin)
  -----------------------------------------------------------
  History:
  - 2012/6/14 Created by minseob

@@ -3,7 +3,7 @@
  -----------------------------------------------------------
  @file  TBTime.cpp
  @brief Time for ToolBase
- @author minseob (rasidin1@hotmail.com)
+ @author minseob (https://github.com/rasidin)
  ***********************************************************/
 #include "TBTime.h"
 

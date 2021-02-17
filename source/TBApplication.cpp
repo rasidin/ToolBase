@@ -3,7 +3,7 @@
  -----------------------------------------------------------
  @file  TBApplication.cpp
  @brief ToolBase Application
- @author minseob (rasidin1@hotmail.com)
+ @author minseob (https://github.com/rasidin)
  -----------------------------------------------------------
  History:
  - 2012/6/14 Created by minseob
